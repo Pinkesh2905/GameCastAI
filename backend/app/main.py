@@ -15,10 +15,11 @@ from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 
 from backend.app import matches as match_service
+from backend.app.config import public_config
 from backend.app.engine import (
     LeagueNotAvailable,
     available_leagues,
@@ -305,3 +306,24 @@ if FRONTEND_DIR.exists():
     @app.get("/favicon.svg", include_in_schema=False)
     def favicon():
         return FileResponse(FRONTEND_DIR / "assets" / "favicon.svg")
+
+
+@app.get("/config.js", include_in_schema=False)
+def config_script() -> Response:
+    """Hand the browser its settings as a script rather than a fetch.
+
+    analytics.js has to know the measurement id before it decides whether to
+    load the GA tag at all. A fetch would mean the tag arrives a round trip
+    late and after the first paint, so instead this is a plain script tag that
+    the browser executes in order, ahead of everything that reads it.
+
+    Never cached: the whole point is that redeploying with a different
+    environment variable takes effect without a rebuild.
+    """
+    payload = json.dumps(public_config(), separators=(",", ":"))
+    body = f"window.GameCastConfig={payload};\n"
+    return Response(
+        content=body,
+        media_type="application/javascript; charset=utf-8",
+        headers={"Cache-Control": "no-store, max-age=0"},
+    )

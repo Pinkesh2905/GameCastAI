@@ -190,26 +190,42 @@ the business questions. Choose **Web** as the platform when asked.
 Click **Create stream**. The panel that opens shows a **MEASUREMENT ID** in the top
 right, of the form `G-XXXXXXXXXX`. Copy it.
 
-### 3. Paste it in
+### 3. Set it as an environment variable
 
-Open [`frontend/js/analytics.js`](frontend/js/analytics.js). Line 55:
+The id is never committed. It is read from `GA_MEASUREMENT_ID` at runtime and
+handed to the browser by `/config.js`, so rotating it is an environment change
+and a restart rather than a rebuild.
 
-```js
-var MEASUREMENT_ID = "";
+**Locally:**
+
+```bash
+cp .env.example .env
 ```
 
-becomes
+Then edit `.env`:
 
-```js
-var MEASUREMENT_ID = "G-XXXXXXXXXX";
+```bash
+GA_MEASUREMENT_ID=G-XXXXXXXXXX
 ```
 
-That is the entire setup. Deploy, open your site, and within a minute or two GA4's
-**Reports → Realtime** should show you as an active user.
+`.env` is gitignored. A real environment variable always beats the file, so
+`GA_MEASUREMENT_ID=G-OTHER python -m uvicorn backend.app.main:app` works for a
+one-off.
 
-> Until a real ID is filled in, nothing is loaded, no cookie is set, and no request
-> leaves the browser. Localhost never reports even with an ID in place, so your own
-> testing will not pollute the numbers.
+**On a host,** set it in the platform's own panel rather than uploading a file:
+
+| Platform | Where |
+|---|---|
+| Vercel | Project → Settings → Environment Variables |
+| Render | Service → Environment → Environment Variables |
+| Railway | Service → Variables |
+| Fly.io | `fly secrets set GA_MEASUREMENT_ID=G-XXXXXXXXXX` |
+
+> With no id set, nothing is loaded, no cookie is set, and no request leaves
+> the browser. Localhost never reports even with an id in place, so your own
+> testing will not pollute the numbers. A malformed id (a lowercase `g-`, or a
+> legacy `UA-` id) logs a warning at startup instead of silently never
+> reporting — which is the failure mode that costs you an afternoon.
 
 ### 4. What you will already be collecting
 

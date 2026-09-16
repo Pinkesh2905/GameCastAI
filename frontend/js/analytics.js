@@ -8,11 +8,16 @@
       deploy to and give the stream a name.
    2. The stream page shows a MEASUREMENT ID that looks like G-XXXXXXXXXX.
       Copy it.
-   3. Paste it into MEASUREMENT_ID below and deploy. That is the whole setup.
-      Nothing else on the page needs changing.
+   3. Set it as the GA_MEASUREMENT_ID environment variable where you deploy.
+      Locally, put it in a .env file at the project root (see .env.example).
+      Nothing in this file changes, and the id is never committed.
 
-   Until a real ID is filled in, every function here is a no-op: no script is
-   loaded, no cookie is set and no request leaves the browser. That keeps local
+   The value arrives on window.GameCastConfig, which /config.js writes and
+   which loads immediately before this script. Nothing is read at build time,
+   so rotating the id is an environment change and a restart, not a rebuild.
+
+   Until an id is set, every function here is a no-op: no script is loaded, no
+   cookie is set and no request leaves the browser. That keeps local
    development clean and means a fork of this repo does not silently report
    into somebody else's property.
 
@@ -51,8 +56,10 @@
 (function (window, document) {
   "use strict";
 
-  // Replace with your own G-XXXXXXXXXX. Leave blank to keep analytics off.
-  var MEASUREMENT_ID = "";
+  // Supplied by /config.js from the GA_MEASUREMENT_ID environment variable.
+  // Absent config is the normal case for a local run, not an error.
+  var config = window.GameCastConfig || {};
+  var MEASUREMENT_ID = config.gaMeasurementId || "";
 
   // Hosts that should never report, so local work stays out of the numbers.
   var EXCLUDED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0", ""];

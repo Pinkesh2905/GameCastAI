@@ -353,6 +353,9 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
+<!-- Settings come from the server environment, so the measurement id is
+     never committed. Must load before analytics.js, which reads it. -->
+<script src="/config.js"></script>
 <script src="/js/analytics.js"></script>
 <script src="/js/api.js"></script>
 <script src="/js/charts.js"></script>

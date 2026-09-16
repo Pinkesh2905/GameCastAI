@@ -201,3 +201,43 @@ class TestReplay:
         order = [m["ball_number"] for m in replay["key_moments"]]
         assert order == sorted(order)
         assert replay["key_moments"]
+
+
+class TestConfig:
+    """The measurement id reaches the browser from the environment, never a commit."""
+
+    def test_config_script_is_javascript(self):
+        response = client.get("/config.js")
+        assert response.status_code == 200
+        assert "javascript" in response.headers["content-type"]
+        assert response.text.startswith("window.GameCastConfig=")
+
+    def test_config_is_never_cached(self):
+        # Rotating the variable and restarting has to be enough; a cached
+        # config would keep serving the old id.
+        assert "no-store" in client.get("/config.js").headers["cache-control"]
+
+    def test_absent_variable_means_analytics_off(self, monkeypatch):
+        monkeypatch.delenv("GA_MEASUREMENT_ID", raising=False)
+        from backend.app.config import public_config
+        assert public_config()["gaMeasurementId"] == ""
+
+    def test_valid_id_passes_through(self, monkeypatch):
+        monkeypatch.setenv("GA_MEASUREMENT_ID", "G-ABC1234567")
+        from backend.app.config import public_config
+        assert public_config()["gaMeasurementId"] == "G-ABC1234567"
+
+    @pytest.mark.parametrize("bad", ["g-abc1234567", "UA-12345-1", "G-SHORT", "nonsense"])
+    def test_a_malformed_id_warns_rather_than_failing_silently(self, monkeypatch, bad):
+        monkeypatch.setenv("GA_MEASUREMENT_ID", bad)
+        from backend.app.config import public_config
+        with pytest.warns(UserWarning, match="GA4 stream id"):
+            assert public_config()["gaMeasurementId"] == ""
+
+    def test_public_config_is_an_allowlist(self, monkeypatch):
+        # A secret that happens to be in the environment must not leak into
+        # the script every visitor downloads.
+        monkeypatch.setenv("SECRET_TOKEN", "hunter2")
+        from backend.app.config import public_config
+        assert set(public_config()) == {"gaMeasurementId", "siteUrl"}
+        assert "hunter2" not in client.get("/config.js").text
