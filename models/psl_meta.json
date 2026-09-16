@@ -1,0 +1,299 @@
+{
+  "league": "psl",
+  "league_name": "Pakistan Super League",
+  "short": "PSL",
+  "accent": "#a78bfa",
+  "trained_at": "2026-09-16T16:39:01Z",
+  "data_source": "Cricsheet (CC BY 4.0)",
+  "matches_total": 357,
+  "date_from": "2016-02-04",
+  "date_to": "2026-05-03",
+  "seasons": 12,
+  "venues": 10,
+  "teams": [
+    "Hyderabad Kingsmen",
+    "Islamabad United",
+    "Karachi Kings",
+    "Lahore Qalandars",
+    "Multan Sultans",
+    "Peshawar Zalmi",
+    "Quetta Gladiators",
+    "Rawalpindiz"
+  ],
+  "priors": {
+    "venue_par": {
+      "Dubai International Cricket Stadium": 154.75,
+      "Gaddafi Stadium": 168.23,
+      "Gaddafi Stadium, Lahore": 175.71,
+      "Multan Cricket Stadium": 170.68,
+      "National Stadium": 168.14,
+      "National Stadium, Karachi": 173.5,
+      "Rawalpindi Cricket Stadium": 179.29,
+      "Sharjah Cricket Stadium": 160.35,
+      "Sheikh Zayed Stadium": 165.55,
+      "Sheikh Zayed Stadium, Abu Dhabi": 169.39
+    },
+    "league_par": 168.06
+  },
+  "chase": {
+    "algorithm": "Logistic Regression",
+    "calibrated": false,
+    "overall": {
+      "rows": 6519,
+      "accuracy": 0.8158,
+      "roc_auc": 0.9224,
+      "brier": 0.1229,
+      "log_loss": 0.3725,
+      "name": "Logistic Regression",
+      "fit_seconds": 0.2
+    },
+    "holdout_bias": 0.0902,
+    "shipped_matches": 346,
+    "by_phase": {
+      "powerplay": {
+        "rows": 2208,
+        "accuracy": 0.7405,
+        "roc_auc": 0.8598,
+        "brier": 0.1678,
+        "log_loss": 0.4902
+      },
+      "middle": {
+        "rows": 3167,
+        "accuracy": 0.8355,
+        "roc_auc": 0.931,
+        "brier": 0.1115,
+        "log_loss": 0.3465
+      },
+      "death": {
+        "rows": 1144,
+        "accuracy": 0.9065,
+        "roc_auc": 0.9747,
+        "brier": 0.0675,
+        "log_loss": 0.2172
+      }
+    },
+    "reliability": [
+      {
+        "bin_low": 0.0,
+        "bin_high": 0.1,
+        "predicted": 0.0219,
+        "observed": 0.0128,
+        "count": 1411
+      },
+      {
+        "bin_low": 0.1,
+        "bin_high": 0.2,
+        "predicted": 0.1497,
+        "observed": 0.2192,
+        "count": 511
+      },
+      {
+        "bin_low": 0.2,
+        "bin_high": 0.3,
+        "predicted": 0.2503,
+        "observed": 0.4444,
+        "count": 522
+      },
+      {
+        "bin_low": 0.3,
+        "bin_high": 0.4,
+        "predicted": 0.3496,
+        "observed": 0.6167,
+        "count": 454
+      },
+      {
+        "bin_low": 0.4,
+        "bin_high": 0.5,
+        "predicted": 0.4521,
+        "observed": 0.6283,
+        "count": 417
+      },
+      {
+        "bin_low": 0.5,
+        "bin_high": 0.6,
+        "predicted": 0.5445,
+        "observed": 0.7526,
+        "count": 392
+      },
+      {
+        "bin_low": 0.6,
+        "bin_high": 0.7,
+        "predicted": 0.6542,
+        "observed": 0.8633,
+        "count": 373
+      },
+      {
+        "bin_low": 0.7,
+        "bin_high": 0.8,
+        "predicted": 0.7498,
+        "observed": 0.8906,
+        "count": 466
+      },
+      {
+        "bin_low": 0.8,
+        "bin_high": 0.9,
+        "predicted": 0.8549,
+        "observed": 0.9177,
+        "count": 620
+      },
+      {
+        "bin_low": 0.9,
+        "bin_high": 1.0,
+        "predicted": 0.9616,
+        "observed": 0.9653,
+        "count": 1353
+      }
+    ],
+    "max_calibration_gap": 0.2671,
+    "importances": [
+      {
+        "feature": "balls_left",
+        "label": "Balls remaining",
+        "importance": 0.10345,
+        "std": 0.00058
+      },
+      {
+        "feature": "runs_per_wicket_needed",
+        "label": "Runs needed per wicket in hand",
+        "importance": 0.08709,
+        "std": 0.00144
+      },
+      {
+        "feature": "required_run_rate",
+        "label": "Required run rate",
+        "importance": 0.06449,
+        "std": 0.00014
+      },
+      {
+        "feature": "runs_left",
+        "label": "Runs still needed",
+        "importance": 0.03746,
+        "std": 0.00131
+      },
+      {
+        "feature": "innings_progress",
+        "label": "How far into the innings",
+        "importance": 0.02473,
+        "std": 0.00078
+      },
+      {
+        "feature": "target_rate",
+        "label": "Difficulty of the target",
+        "importance": 0.00789,
+        "std": 0.00071
+      },
+      {
+        "feature": "pressure_index",
+        "label": "Rate pressure (RRR minus CRR)",
+        "importance": 0.00627,
+        "std": 0.00029
+      },
+      {
+        "feature": "wickets_last_30",
+        "label": "Wickets in the last 5 overs",
+        "importance": 0.00361,
+        "std": 0.00028
+      },
+      {
+        "feature": "current_run_rate",
+        "label": "Current run rate",
+        "importance": 0.00108,
+        "std": 0.00021
+      },
+      {
+        "feature": "phase",
+        "label": "Innings phase",
+        "importance": 0.00067,
+        "std": 0.00012
+      },
+      {
+        "feature": "target_vs_par",
+        "label": "Target versus this venue par",
+        "importance": 0.00037,
+        "std": 9e-05
+      },
+      {
+        "feature": "runs_last_30",
+        "label": "Runs in the last 5 overs",
+        "importance": 0.00017,
+        "std": 9e-05
+      },
+      {
+        "feature": "balls_per_wicket",
+        "label": "Balls per wicket in hand",
+        "importance": -0.00012,
+        "std": 6e-05
+      },
+      {
+        "feature": "wickets_left",
+        "label": "Wickets in hand",
+        "importance": -0.00211,
+        "std": 0.00046
+      }
+    ],
+    "train_rows": 31423,
+    "train_matches": 284,
+    "test_rows": 6519,
+    "test_matches": 62,
+    "base_rate": 0.5578
+  },
+  "setting": {
+    "mae": 18.72,
+    "band_nominal": 0.8,
+    "band_coverage": 0.7285,
+    "band_mean_width": 50.6,
+    "train_rows": 33702,
+    "test_rows": 7353,
+    "test_matches": 62,
+    "importances": [
+      {
+        "feature": "current_run_rate",
+        "label": "Current run rate",
+        "importance": 10.9168,
+        "std": 0.03202
+      },
+      {
+        "feature": "wickets_left",
+        "label": "Wickets in hand",
+        "importance": 3.86288,
+        "std": 0.10009
+      },
+      {
+        "feature": "balls_per_wicket",
+        "label": "Balls per wicket in hand",
+        "importance": 1.62583,
+        "std": 0.03152
+      },
+      {
+        "feature": "runs_last_30",
+        "label": "Runs in the last 5 overs",
+        "importance": 0.58681,
+        "std": 0.024
+      },
+      {
+        "feature": "venue_par",
+        "label": "Venue par score",
+        "importance": 0.4382,
+        "std": 0.02098
+      },
+      {
+        "feature": "score",
+        "label": "Runs scored so far",
+        "importance": 0.33177,
+        "std": 0.00747
+      },
+      {
+        "feature": "wickets_last_30",
+        "label": "Wickets in the last 5 overs",
+        "importance": 0.05652,
+        "std": 0.0078
+      },
+      {
+        "feature": "balls_bowled",
+        "label": "Balls bowled",
+        "importance": 0.02466,
+        "std": 0.00353
+      }
+    ]
+  }
+}

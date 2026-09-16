@@ -1,0 +1,11 @@
+# Keep LF in the repository regardless of the platform a clone happens on, so
+# a Windows checkout does not turn every source file into a whitespace diff.
+* text=auto eol=lf
+
+# Binary artefacts. Never normalise these, and do not try to diff them.
+*.parquet  binary
+*.joblib   binary
+*.pkl      binary
+*.png      binary
+*.jpg      binary
+*.ico      binary

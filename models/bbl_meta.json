@@ -1,0 +1,320 @@
+{
+  "league": "bbl",
+  "league_name": "Big Bash League",
+  "short": "BBL",
+  "accent": "#22c55e",
+  "trained_at": "2026-09-16T16:38:58Z",
+  "data_source": "Cricsheet (CC BY 4.0)",
+  "matches_total": 662,
+  "date_from": "2011-12-16",
+  "date_to": "2026-01-25",
+  "seasons": 15,
+  "venues": 32,
+  "teams": [
+    "Adelaide Strikers",
+    "Brisbane Heat",
+    "Hobart Hurricanes",
+    "Melbourne Renegades",
+    "Melbourne Stars",
+    "Perth Scorchers",
+    "Sydney Sixers",
+    "Sydney Thunder"
+  ],
+  "priors": {
+    "venue_par": {
+      "Adelaide Oval": 164.44,
+      "Aurora Stadium": 160.49,
+      "Aurora Stadium, Launceston": 160.88,
+      "Bellerive Oval": 166.1,
+      "Bellerive Oval, Hobart": 161.05,
+      "Brisbane Cricket Ground": 160.01,
+      "Brisbane Cricket Ground, Woolloongabba": 163.54,
+      "Brisbane Cricket Ground, Woolloongabba, Brisbane": 166.79,
+      "Carrara Oval": 160.82,
+      "Cazaly's Stadium, Cairns": 161.59,
+      "Docklands Stadium": 158.72,
+      "Docklands Stadium, Melbourne": 164.28,
+      "GMHBA Stadium, South Geelong, Victoria": 159.38,
+      "Geelong Cricket Ground": 162.43,
+      "International Sports Stadium": 161.91,
+      "International Sports Stadium, Coffs Harbour": 162.41,
+      "Junction Oval, Melbourne": 164.13,
+      "Lavington Sports Oval, Albury": 163.59,
+      "Manuka Oval": 163.84,
+      "Manuka Oval, Canberra": 159.95,
+      "Melbourne Cricket Ground": 158.67,
+      "Perth Stadium": 162.97,
+      "Simonds Stadium, South Geelong, Victoria": 160.48,
+      "Stadium Australia": 159.0,
+      "Sydney Cricket Ground": 158.28,
+      "Sydney Showground Stadium": 158.22,
+      "Ted Summerton Reserve": 161.66,
+      "Traeger Park": 158.88,
+      "University of Tasmania Stadium, Launceston": 159.7,
+      "W.A.C.A. Ground": 161.18,
+      "Western Australia Cricket Association Ground": 159.35
+    },
+    "league_par": 161.44
+  },
+  "chase": {
+    "algorithm": "Logistic Regression",
+    "calibrated": false,
+    "overall": {
+      "rows": 12034,
+      "accuracy": 0.7729,
+      "roc_auc": 0.8769,
+      "brier": 0.1521,
+      "log_loss": 0.4616,
+      "name": "Logistic Regression",
+      "fit_seconds": 0.4
+    },
+    "holdout_bias": 0.1085,
+    "shipped_matches": 615,
+    "by_phase": {
+      "powerplay": {
+        "rows": 3934,
+        "accuracy": 0.6777,
+        "roc_auc": 0.7741,
+        "brier": 0.2091,
+        "log_loss": 0.6184
+      },
+      "middle": {
+        "rows": 5818,
+        "accuracy": 0.7927,
+        "roc_auc": 0.8894,
+        "brier": 0.1399,
+        "log_loss": 0.4283
+      },
+      "death": {
+        "rows": 2282,
+        "accuracy": 0.8865,
+        "roc_auc": 0.9616,
+        "brier": 0.0848,
+        "log_loss": 0.2766
+      }
+    },
+    "reliability": [
+      {
+        "bin_low": 0.0,
+        "bin_high": 0.1,
+        "predicted": 0.0255,
+        "observed": 0.0884,
+        "count": 2218
+      },
+      {
+        "bin_low": 0.1,
+        "bin_high": 0.2,
+        "predicted": 0.1493,
+        "observed": 0.3399,
+        "count": 968
+      },
+      {
+        "bin_low": 0.2,
+        "bin_high": 0.3,
+        "predicted": 0.249,
+        "observed": 0.5139,
+        "count": 685
+      },
+      {
+        "bin_low": 0.3,
+        "bin_high": 0.4,
+        "predicted": 0.3487,
+        "observed": 0.5446,
+        "count": 784
+      },
+      {
+        "bin_low": 0.4,
+        "bin_high": 0.5,
+        "predicted": 0.451,
+        "observed": 0.6662,
+        "count": 782
+      },
+      {
+        "bin_low": 0.5,
+        "bin_high": 0.6,
+        "predicted": 0.549,
+        "observed": 0.7082,
+        "count": 1004
+      },
+      {
+        "bin_low": 0.6,
+        "bin_high": 0.7,
+        "predicted": 0.6508,
+        "observed": 0.7224,
+        "count": 1232
+      },
+      {
+        "bin_low": 0.7,
+        "bin_high": 0.8,
+        "predicted": 0.7509,
+        "observed": 0.8467,
+        "count": 1037
+      },
+      {
+        "bin_low": 0.8,
+        "bin_high": 0.9,
+        "predicted": 0.8545,
+        "observed": 0.9416,
+        "count": 1096
+      },
+      {
+        "bin_low": 0.9,
+        "bin_high": 1.0,
+        "predicted": 0.9613,
+        "observed": 0.9776,
+        "count": 2228
+      }
+    ],
+    "max_calibration_gap": 0.2649,
+    "importances": [
+      {
+        "feature": "runs_per_wicket_needed",
+        "label": "Runs needed per wicket in hand",
+        "importance": 0.08469,
+        "std": 0.00119
+      },
+      {
+        "feature": "required_run_rate",
+        "label": "Required run rate",
+        "importance": 0.06895,
+        "std": 0.00067
+      },
+      {
+        "feature": "innings_progress",
+        "label": "How far into the innings",
+        "importance": 0.03888,
+        "std": 0.00042
+      },
+      {
+        "feature": "target_vs_par",
+        "label": "Target versus this venue par",
+        "importance": 0.02535,
+        "std": 0.00073
+      },
+      {
+        "feature": "wickets_left",
+        "label": "Wickets in hand",
+        "importance": 0.01965,
+        "std": 0.00057
+      },
+      {
+        "feature": "balls_per_wicket",
+        "label": "Balls per wicket in hand",
+        "importance": 0.01659,
+        "std": 0.00058
+      },
+      {
+        "feature": "target_rate",
+        "label": "Difficulty of the target",
+        "importance": 0.01618,
+        "std": 0.00052
+      },
+      {
+        "feature": "balls_left",
+        "label": "Balls remaining",
+        "importance": 0.01527,
+        "std": 0.00019
+      },
+      {
+        "feature": "runs_left",
+        "label": "Runs still needed",
+        "importance": 0.0123,
+        "std": 0.00051
+      },
+      {
+        "feature": "current_run_rate",
+        "label": "Current run rate",
+        "importance": 0.00056,
+        "std": 6e-05
+      },
+      {
+        "feature": "wickets_last_30",
+        "label": "Wickets in the last 5 overs",
+        "importance": 0.0005,
+        "std": 3e-05
+      },
+      {
+        "feature": "phase",
+        "label": "Innings phase",
+        "importance": 0.0005,
+        "std": 5e-05
+      },
+      {
+        "feature": "runs_last_30",
+        "label": "Runs in the last 5 overs",
+        "importance": 8e-05,
+        "std": 6e-05
+      },
+      {
+        "feature": "pressure_index",
+        "label": "Rate pressure (RRR minus CRR)",
+        "importance": -0.00035,
+        "std": 0.00011
+      }
+    ],
+    "train_rows": 55614,
+    "train_matches": 505,
+    "test_rows": 12034,
+    "test_matches": 110,
+    "base_rate": 0.5301
+  },
+  "setting": {
+    "mae": 15.25,
+    "band_nominal": 0.8,
+    "band_coverage": 0.7542,
+    "band_mean_width": 44.5,
+    "train_rows": 61635,
+    "test_rows": 13462,
+    "test_matches": 113,
+    "importances": [
+      {
+        "feature": "current_run_rate",
+        "label": "Current run rate",
+        "importance": 10.36376,
+        "std": 0.16326
+      },
+      {
+        "feature": "wickets_left",
+        "label": "Wickets in hand",
+        "importance": 2.41404,
+        "std": 0.0334
+      },
+      {
+        "feature": "score",
+        "label": "Runs scored so far",
+        "importance": 0.88813,
+        "std": 0.00498
+      },
+      {
+        "feature": "balls_per_wicket",
+        "label": "Balls per wicket in hand",
+        "importance": 0.76684,
+        "std": 0.04824
+      },
+      {
+        "feature": "venue_par",
+        "label": "Venue par score",
+        "importance": 0.38649,
+        "std": 0.01937
+      },
+      {
+        "feature": "balls_bowled",
+        "label": "Balls bowled",
+        "importance": 0.0952,
+        "std": 0.00188
+      },
+      {
+        "feature": "runs_last_30",
+        "label": "Runs in the last 5 overs",
+        "importance": 0.07901,
+        "std": 0.00835
+      },
+      {
+        "feature": "wickets_last_30",
+        "label": "Wickets in the last 5 overs",
+        "importance": 0.00717,
+        "std": 0.00448
+      }
+    ]
+  }
+}

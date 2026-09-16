@@ -1,0 +1,352 @@
+{
+  "league": "ipl",
+  "league_name": "Indian Premier League",
+  "short": "IPL",
+  "accent": "#f0c040",
+  "trained_at": "2026-09-16T16:38:36Z",
+  "data_source": "Cricsheet (CC BY 4.0)",
+  "matches_total": 1243,
+  "date_from": "2008-04-18",
+  "date_to": "2026-05-31",
+  "seasons": 19,
+  "venues": 60,
+  "teams": [
+    "Chennai Super Kings",
+    "Deccan Chargers",
+    "Delhi Capitals",
+    "Gujarat Lions",
+    "Gujarat Titans",
+    "Kochi Tuskers Kerala",
+    "Kolkata Knight Riders",
+    "Lucknow Super Giants",
+    "Mumbai Indians",
+    "Pune Warriors India",
+    "Punjab Kings",
+    "Rajasthan Royals",
+    "Rising Pune Supergiants",
+    "Royal Challengers Bengaluru",
+    "Sunrisers Hyderabad"
+  ],
+  "priors": {
+    "venue_par": {
+      "Arun Jaitley Stadium": 164.37,
+      "Arun Jaitley Stadium, Delhi": 169.21,
+      "Barabati Stadium": 164.94,
+      "Barsapara Cricket Stadium, Guwahati": 166.4,
+      "Bharat Ratna Shri Atal Bihari Vajpayee Ekana Cricket Stadium, Lucknow": 162.21,
+      "Brabourne Stadium": 168.32,
+      "Brabourne Stadium, Mumbai": 169.04,
+      "Buffalo Park": 162.75,
+      "De Beers Diamond Oval": 163.72,
+      "Dr DY Patil Sports Academy": 157.91,
+      "Dr DY Patil Sports Academy, Mumbai": 166.85,
+      "Dr. Y.S. Rajasekhara Reddy ACA-VDCA Cricket Stadium": 162.89,
+      "Dubai International Cricket Stadium": 163.39,
+      "Eden Gardens": 162.19,
+      "Eden Gardens, Kolkata": 171.12,
+      "Feroz Shah Kotla": 164.48,
+      "Green Park": 163.93,
+      "Himachal Pradesh Cricket Association Stadium": 166.92,
+      "Himachal Pradesh Cricket Association Stadium, Dharamsala": 166.52,
+      "Holkar Cricket Stadium": 163.38,
+      "JSCA International Stadium Complex": 161.4,
+      "Kingsmead": 160.24,
+      "M Chinnaswamy Stadium": 167.25,
+      "M Chinnaswamy Stadium, Bengaluru": 169.46,
+      "M.Chinnaswamy Stadium": 169.9,
+      "MA Chidambaram Stadium": 161.12,
+      "MA Chidambaram Stadium, Chepauk": 165.74,
+      "MA Chidambaram Stadium, Chepauk, Chennai": 162.91,
+      "Maharashtra Cricket Association Stadium": 165.19,
+      "Maharashtra Cricket Association Stadium, Pune": 166.46,
+      "Narendra Modi Stadium, Ahmedabad": 166.36,
+      "Nehru Stadium": 162.7,
+      "New Wanderers Stadium": 160.02,
+      "Newlands": 161.45,
+      "OUTsurance Oval": 162.46,
+      "Punjab Cricket Association IS Bindra Stadium": 167.12,
+      "Punjab Cricket Association IS Bindra Stadium, Mohali": 164.24,
+      "Punjab Cricket Association IS Bindra Stadium, Mohali, Chandigarh": 168.43,
+      "Punjab Cricket Association Stadium, Mohali": 163.75,
+      "Rajiv Gandhi International Stadium": 163.73,
+      "Rajiv Gandhi International Stadium, Uppal": 160.48,
+      "Rajiv Gandhi International Stadium, Uppal, Hyderabad": 166.21,
+      "Sardar Patel Stadium, Motera": 163.31,
+      "Saurashtra Cricket Association Stadium": 165.76,
+      "Sawai Mansingh Stadium": 160.35,
+      "Sawai Mansingh Stadium, Jaipur": 165.36,
+      "Shaheed Veer Narayan Singh International Stadium": 161.3,
+      "Sharjah Cricket Stadium": 161.75,
+      "Sheikh Zayed Stadium": 161.77,
+      "St George's Park": 163.29,
+      "Subrata Roy Sahara Stadium": 159.12,
+      "SuperSport Park": 161.02,
+      "Vidarbha Cricket Association Stadium, Jamtha": 162.93,
+      "Wankhede Stadium": 165.56,
+      "Wankhede Stadium, Mumbai": 170.32,
+      "Zayed Cricket Stadium, Abu Dhabi": 163.18
+    },
+    "league_par": 164.29
+  },
+  "chase": {
+    "algorithm": "Logistic Regression",
+    "calibrated": false,
+    "overall": {
+      "rows": 23606,
+      "accuracy": 0.813,
+      "roc_auc": 0.912,
+      "brier": 0.1284,
+      "log_loss": 0.3972,
+      "name": "Logistic Regression",
+      "fit_seconds": 0.5
+    },
+    "holdout_bias": 0.0769,
+    "shipped_matches": 1195,
+    "by_phase": {
+      "powerplay": {
+        "rows": 7707,
+        "accuracy": 0.7308,
+        "roc_auc": 0.8611,
+        "brier": 0.1787,
+        "log_loss": 0.5325
+      },
+      "middle": {
+        "rows": 11293,
+        "accuracy": 0.8317,
+        "roc_auc": 0.9193,
+        "brier": 0.1179,
+        "log_loss": 0.3756
+      },
+      "death": {
+        "rows": 4606,
+        "accuracy": 0.9047,
+        "roc_auc": 0.9697,
+        "brier": 0.0701,
+        "log_loss": 0.2236
+      }
+    },
+    "reliability": [
+      {
+        "bin_low": 0.0,
+        "bin_high": 0.1,
+        "predicted": 0.0322,
+        "observed": 0.0518,
+        "count": 5642
+      },
+      {
+        "bin_low": 0.1,
+        "bin_high": 0.2,
+        "predicted": 0.1469,
+        "observed": 0.1896,
+        "count": 2357
+      },
+      {
+        "bin_low": 0.2,
+        "bin_high": 0.3,
+        "predicted": 0.25,
+        "observed": 0.3835,
+        "count": 1901
+      },
+      {
+        "bin_low": 0.3,
+        "bin_high": 0.4,
+        "predicted": 0.349,
+        "observed": 0.508,
+        "count": 1681
+      },
+      {
+        "bin_low": 0.4,
+        "bin_high": 0.5,
+        "predicted": 0.4504,
+        "observed": 0.5709,
+        "count": 1452
+      },
+      {
+        "bin_low": 0.5,
+        "bin_high": 0.6,
+        "predicted": 0.549,
+        "observed": 0.673,
+        "count": 1624
+      },
+      {
+        "bin_low": 0.6,
+        "bin_high": 0.7,
+        "predicted": 0.6492,
+        "observed": 0.7893,
+        "count": 1533
+      },
+      {
+        "bin_low": 0.7,
+        "bin_high": 0.8,
+        "predicted": 0.752,
+        "observed": 0.8976,
+        "count": 1827
+      },
+      {
+        "bin_low": 0.8,
+        "bin_high": 0.9,
+        "predicted": 0.8537,
+        "observed": 0.9233,
+        "count": 2035
+      },
+      {
+        "bin_low": 0.9,
+        "bin_high": 1.0,
+        "predicted": 0.9572,
+        "observed": 0.9811,
+        "count": 3554
+      }
+    ],
+    "max_calibration_gap": 0.159,
+    "importances": [
+      {
+        "feature": "balls_left",
+        "label": "Balls remaining",
+        "importance": 0.22086,
+        "std": 0.00125
+      },
+      {
+        "feature": "innings_progress",
+        "label": "How far into the innings",
+        "importance": 0.1829,
+        "std": 0.00053
+      },
+      {
+        "feature": "runs_per_wicket_needed",
+        "label": "Runs needed per wicket in hand",
+        "importance": 0.0916,
+        "std": 0.00024
+      },
+      {
+        "feature": "target_vs_par",
+        "label": "Target versus this venue par",
+        "importance": 0.08438,
+        "std": 0.00149
+      },
+      {
+        "feature": "required_run_rate",
+        "label": "Required run rate",
+        "importance": 0.06752,
+        "std": 0.00148
+      },
+      {
+        "feature": "target_rate",
+        "label": "Difficulty of the target",
+        "importance": 0.03104,
+        "std": 0.001
+      },
+      {
+        "feature": "runs_left",
+        "label": "Runs still needed",
+        "importance": 0.01886,
+        "std": 3e-05
+      },
+      {
+        "feature": "wickets_left",
+        "label": "Wickets in hand",
+        "importance": 0.01008,
+        "std": 9e-05
+      },
+      {
+        "feature": "balls_per_wicket",
+        "label": "Balls per wicket in hand",
+        "importance": 0.00322,
+        "std": 5e-05
+      },
+      {
+        "feature": "pressure_index",
+        "label": "Rate pressure (RRR minus CRR)",
+        "importance": 0.0031,
+        "std": 0.00014
+      },
+      {
+        "feature": "current_run_rate",
+        "label": "Current run rate",
+        "importance": 0.0014,
+        "std": 8e-05
+      },
+      {
+        "feature": "wickets_last_30",
+        "label": "Wickets in the last 5 overs",
+        "importance": 0.00122,
+        "std": 5e-05
+      },
+      {
+        "feature": "phase",
+        "label": "Innings phase",
+        "importance": 0.00074,
+        "std": 1e-05
+      },
+      {
+        "feature": "runs_last_30",
+        "label": "Runs in the last 5 overs",
+        "importance": -0.00064,
+        "std": 4e-05
+      }
+    ],
+    "train_rows": 109895,
+    "train_matches": 980,
+    "test_rows": 23606,
+    "test_matches": 215,
+    "base_rate": 0.5439
+  },
+  "setting": {
+    "mae": 19.2,
+    "band_nominal": 0.8,
+    "band_coverage": 0.7292,
+    "band_mean_width": 50.1,
+    "train_rows": 119175,
+    "test_rows": 25991,
+    "test_matches": 218,
+    "importances": [
+      {
+        "feature": "current_run_rate",
+        "label": "Current run rate",
+        "importance": 12.49144,
+        "std": 0.07587
+      },
+      {
+        "feature": "wickets_left",
+        "label": "Wickets in hand",
+        "importance": 2.71154,
+        "std": 0.01111
+      },
+      {
+        "feature": "balls_per_wicket",
+        "label": "Balls per wicket in hand",
+        "importance": 2.26334,
+        "std": 0.02412
+      },
+      {
+        "feature": "score",
+        "label": "Runs scored so far",
+        "importance": 1.04053,
+        "std": 0.01111
+      },
+      {
+        "feature": "venue_par",
+        "label": "Venue par score",
+        "importance": 0.50301,
+        "std": 0.03317
+      },
+      {
+        "feature": "wickets_last_30",
+        "label": "Wickets in the last 5 overs",
+        "importance": 0.16068,
+        "std": 0.00376
+      },
+      {
+        "feature": "runs_last_30",
+        "label": "Runs in the last 5 overs",
+        "importance": 0.10212,
+        "std": 0.00453
+      },
+      {
+        "feature": "balls_bowled",
+        "label": "Balls bowled",
+        "importance": 0.05254,
+        "std": 0.00134
+      }
+    ]
+  }
+}

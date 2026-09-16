@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>GameCastAI - T20 win probability</title>
+<meta name="description" content="Live win probability and score projection for T20 cricket chases, trained on real ball-by-ball data from 5,889 matches.">
+<meta name="theme-color" content="#0B1210">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="GameCastAI - T20 win probability">
+<meta property="og:description" content="Turn any T20 chase into a calibrated win probability, and replay real matches ball by ball.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="masthead">
+  <div class="shell masthead-inner">
+    <a class="wordmark" href="/" aria-label="GameCastAI home">
+      <svg class="wordmark-mark" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/>
+        <path d="M5 8.5c4.6 1.6 9.4 1.6 14 0M5 15.5c4.6-1.6 9.4-1.6 14 0" fill="none" stroke="currentColor" stroke-width="1.2"/>
+      </svg>
+      <span>GameCast<em>AI</em></span>
+    </a>
+
+    <div class="league-picker" role="group" aria-label="Competition">
+      <label class="sr-only" for="league">Competition</label>
+      <select id="league" name="league" class="select select-compact">
+        <option value="ipl">Loading…</option>
+      </select>
+    </div>
+  </div>
+
+  <nav class="tabs shell" aria-label="Sections">
+    <button class="tab is-current" data-view="chase" aria-current="page">Chase</button>
+    <button class="tab" data-view="innings">1st innings</button>
+    <button class="tab" data-view="replay">Replay</button>
+    <button class="tab" data-view="model">Model</button>
+  </nav>
+</header>
+
+<main id="main" class="shell">
+
+  <!-- ══ CHASE ══════════════════════════════════════════════════════════ -->
+  <section class="view is-current" id="view-chase" aria-labelledby="chase-heading">
+    <h1 class="sr-only" id="chase-heading">Chase win probability</h1>
+
+    <!-- The readout is sticky on small screens so the number stays visible
+         while the inputs below it are being adjusted. -->
+    <div class="readout" id="readout" aria-live="polite">
+      <div class="readout-figure">
+        <span class="pct" id="pct">—</span>
+        <span class="pct-sign">%</span>
+      </div>
+      <div class="readout-meta">
+        <p class="readout-team" id="readout-team">Set up a chase below</p>
+        <p class="readout-note" id="readout-note">Win probability for the chasing side</p>
+      </div>
+
+      <div class="split" role="img" id="split-figure" aria-label="Win probability split">
+        <div class="split-bar">
+          <span class="split-bat" id="split-bat" style="transform:scaleX(0.5)"></span>
+          <span class="split-bowl" id="split-bowl" style="transform:scaleX(0.5)"></span>
+        </div>
+        <div class="split-legend">
+          <span class="legend legend-bat"><b id="legend-bat-pct">—</b> <span id="legend-bat-name">Chasing</span></span>
+          <span class="legend legend-bowl"><span id="legend-bowl-name">Defending</span> <b id="legend-bowl-pct">—</b></span>
+        </div>
+      </div>
+
+      <p class="confidence" id="confidence"></p>
+    </div>
+
+    <div class="columns">
+      <div class="col-inputs">
+        <form class="panel" id="chase-form" novalidate>
+          <h2 class="panel-title">The match</h2>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="batting-team">Chasing</label>
+              <select id="batting-team" name="batting_team" class="select"></select>
+            </div>
+            <div class="field">
+              <label for="bowling-team">Defending</label>
+              <select id="bowling-team" name="bowling_team" class="select"></select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="venue">Venue <span class="field-hint" id="venue-hint"></span></label>
+            <select id="venue" name="venue" class="select"></select>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="target">Target</label>
+              <input id="target" name="target" class="input tabular" type="number"
+                     inputmode="numeric" min="1" max="400" step="1" value="181"
+                     autocomplete="off" spellcheck="false">
+            </div>
+            <div class="field">
+              <label for="total-overs">Overs in chase</label>
+              <select id="total-overs" name="total_overs" class="select">
+                <option value="20" selected>20 overs</option>
+                <option value="15">15 overs (rain)</option>
+                <option value="10">10 overs (rain)</option>
+                <option value="5">5 overs (rain)</option>
+              </select>
+            </div>
+          </div>
+
+          <h2 class="panel-title panel-title-spaced">Where the chase stands</h2>
+
+          <div class="field">
+            <div class="label-line">
+              <label for="score">Runs scored</label>
+              <output class="value tabular" id="score-out" for="score">95</output>
+            </div>
+            <input id="score" name="score" class="range" type="range" min="0" max="180" step="1" value="95">
+          </div>
+
+          <div class="field">
+            <div class="label-line">
+              <label for="balls">Overs bowled</label>
+              <output class="value mono" id="balls-out" for="balls">11.0</output>
+            </div>
+            <input id="balls" name="balls" class="range" type="range" min="0" max="120" step="1" value="66">
+          </div>
+
+          <div class="field">
+            <div class="label-line">
+              <label for="wickets">Wickets down</label>
+              <output class="value tabular" id="wickets-out" for="wickets">3</output>
+            </div>
+            <input id="wickets" name="wickets" class="range" type="range" min="0" max="10" step="1" value="3">
+          </div>
+
+          <details class="advanced">
+            <summary>Recent form <span class="summary-note">last 5 overs</span></summary>
+            <div class="field-row">
+              <div class="field">
+                <div class="label-line">
+                  <label for="form-runs">Runs</label>
+                  <output class="value tabular" id="form-runs-out" for="form-runs">44</output>
+                </div>
+                <input id="form-runs" name="form_runs" class="range" type="range" min="0" max="120" step="1" value="44">
+              </div>
+              <div class="field">
+                <div class="label-line">
+                  <label for="form-wickets">Wickets</label>
+                  <output class="value tabular" id="form-wickets-out" for="form-wickets">1</output>
+                </div>
+                <input id="form-wickets" name="form_wickets" class="range" type="range" min="0" max="6" step="1" value="1">
+              </div>
+            </div>
+          </details>
+
+          <div class="actions">
+            <button class="btn btn-ghost" type="button" id="copy-link">Copy link to this scenario</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="col-output">
+        <section class="panel" aria-labelledby="state-heading">
+          <h2 class="panel-title" id="state-heading">The state of it</h2>
+          <dl class="scoreboard" id="scoreboard"></dl>
+          <div class="narrative" id="narrative"></div>
+        </section>
+
+        <section class="panel" aria-labelledby="curve-heading">
+          <div class="panel-head">
+            <h2 class="panel-title" id="curve-heading">Where the cliff is</h2>
+            <p class="panel-sub">Win probability at this over and wicket count, across every score the side could be on</p>
+          </div>
+          <figure class="chart" id="curve-chart"></figure>
+        </section>
+
+        <section class="panel" aria-labelledby="scenarios-heading">
+          <div class="panel-head">
+            <h2 class="panel-title" id="scenarios-heading">What the next over is worth</h2>
+            <p class="panel-sub">Tap one to play it out</p>
+          </div>
+          <ul class="scenarios" id="scenarios"></ul>
+        </section>
+
+        <div class="panel-pair">
+          <section class="panel" aria-labelledby="wickets-heading">
+            <h2 class="panel-title" id="wickets-heading">Cost of a wicket</h2>
+            <figure class="chart chart-short" id="wickets-chart"></figure>
+          </section>
+
+          <section class="panel" aria-labelledby="matrix-heading">
+            <h2 class="panel-title" id="matrix-heading">Over by over</h2>
+            <table class="matrix" id="matrix">
+              <thead><tr><th scope="col">Over</th><th scope="col">Need</th><th scope="col">Left after</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </section>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ FIRST INNINGS ══════════════════════════════════════════════════ -->
+  <section class="view" id="view-innings" hidden aria-labelledby="innings-heading">
+    <h1 class="section-heading" id="innings-heading">What total is this heading for?</h1>
+    <p class="section-lede">The first innings has no chase to model, so the question changes: given where a side is now, what do they finish on?</p>
+
+    <div class="columns">
+      <div class="col-inputs">
+        <form class="panel" id="innings-form" novalidate>
+          <h2 class="panel-title">The innings</h2>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="i-batting">Batting</label>
+              <select id="i-batting" name="batting_team" class="select"></select>
+            </div>
+            <div class="field">
+              <label for="i-bowling">Bowling</label>
+              <select id="i-bowling" name="bowling_team" class="select"></select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="i-venue">Venue</label>
+            <select id="i-venue" name="venue" class="select"></select>
+          </div>
+
+          <div class="field">
+            <div class="label-line">
+              <label for="i-score">Runs scored</label>
+              <output class="value tabular" id="i-score-out" for="i-score">62</output>
+            </div>
+            <input id="i-score" class="range" type="range" min="0" max="300" step="1" value="62">
+          </div>
+
+          <div class="field">
+            <div class="label-line">
+              <label for="i-balls">Overs bowled</label>
+              <output class="value mono" id="i-balls-out" for="i-balls">6.0</output>
+            </div>
+            <input id="i-balls" class="range" type="range" min="0" max="119" step="1" value="36">
+          </div>
+
+          <div class="field">
+            <div class="label-line">
+              <label for="i-wickets">Wickets down</label>
+              <output class="value tabular" id="i-wickets-out" for="i-wickets">1</output>
+            </div>
+            <input id="i-wickets" class="range" type="range" min="0" max="10" step="1" value="1">
+          </div>
+
+          <details class="advanced">
+            <summary>Recent form <span class="summary-note">last 5 overs</span></summary>
+            <div class="field-row">
+              <div class="field">
+                <div class="label-line">
+                  <label for="i-form-runs">Runs</label>
+                  <output class="value tabular" id="i-form-runs-out" for="i-form-runs">48</output>
+                </div>
+                <input id="i-form-runs" class="range" type="range" min="0" max="120" step="1" value="48">
+              </div>
+              <div class="field">
+                <div class="label-line">
+                  <label for="i-form-wickets">Wickets</label>
+                  <output class="value tabular" id="i-form-wickets-out" for="i-form-wickets">1</output>
+                </div>
+                <input id="i-form-wickets" class="range" type="range" min="0" max="6" step="1" value="1">
+              </div>
+            </div>
+          </details>
+        </form>
+      </div>
+
+      <div class="col-output">
+        <section class="panel projection" aria-live="polite">
+          <h2 class="panel-title">Projected total</h2>
+          <div class="projection-figure">
+            <span class="proj-number tabular" id="proj-number">—</span>
+            <span class="proj-band mono" id="proj-band"></span>
+          </div>
+          <figure class="chart chart-short" id="proj-chart"></figure>
+          <p class="proj-note" id="proj-note"></p>
+        </section>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ REPLAY ═════════════════════════════════════════════════════════ -->
+  <section class="view" id="view-replay" hidden aria-labelledby="replay-heading">
+    <h1 class="section-heading" id="replay-heading">Replay a real match</h1>
+    <p class="section-lede">Every completed chase in the archive, scored ball by ball by the same model. Drag the worm to scrub through it.</p>
+
+    <div class="replay-controls panel">
+      <div class="field-row">
+        <div class="field field-grow">
+          <label for="match-search">Find a match</label>
+          <input id="match-search" class="input" type="search" placeholder="Team, ground or date"
+                 autocomplete="off" spellcheck="false" enterkeyhint="search">
+        </div>
+        <div class="field">
+          <label for="match-season">Season</label>
+          <select id="match-season" class="select"><option value="">All</option></select>
+        </div>
+      </div>
+      <p class="result-count" id="match-count" aria-live="polite"></p>
+    </div>
+
+    <div class="replay-body">
+      <div class="match-list-wrap panel">
+        <ul class="match-list" id="match-list"></ul>
+      </div>
+
+      <div class="replay-stage" id="replay-stage">
+        <div class="empty-state" id="replay-empty">
+          <svg viewBox="0 0 48 32" class="empty-mark" aria-hidden="true">
+            <path d="M2 24 L12 18 L20 22 L30 8 L38 14 L46 4" fill="none" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+          <p class="empty-title">Pick a match</p>
+          <p class="empty-note">Choose any game from the list to see how its win probability moved, delivery by delivery.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ MODEL ══════════════════════════════════════════════════════════ -->
+  <section class="view" id="view-model" hidden aria-labelledby="model-heading">
+    <h1 class="section-heading" id="model-heading">How this works, and how well</h1>
+    <p class="section-lede">A win probability is only worth showing if it can be checked. Everything below is measured on matches the model never trained on.</p>
+    <div id="model-card"></div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="shell footer-inner">
+    <p>Ball-by-ball data from <a href="https://cricsheet.org" target="_blank" rel="noopener">Cricsheet</a>, licensed CC&nbsp;BY&nbsp;4.0. Not affiliated with any league or broadcaster.</p>
+    <p class="footer-meta">GameCastAI is a modelling exercise, not betting advice.</p>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script src="/js/analytics.js"></script>
+<script src="/js/api.js"></script>
+<script src="/js/charts.js"></script>
+<script src="/js/app.js"></script>
+</body>
+</html>
