@@ -24,3 +24,5 @@ data/processed/*_setting.parquet
 
 *.log
 .DS_Store
+
+.vercel

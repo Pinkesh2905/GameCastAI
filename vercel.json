@@ -6,17 +6,38 @@
       "src": "api/index.py",
       "use": "@vercel/python",
       "config": {
-        "maxLambdaSize": "250mb",
-        "includeFiles": "{backend/**,models/*.json,models/*.npz,data/serve/**,frontend/**}"
+        "runtime": "python3.12",
+        "includeFiles": [
+          "backend/**",
+          "models/*.json",
+          "models/*.npz",
+          "data/serve/**",
+          "frontend/**"
+        ]
       }
+    },
+    {
+      "src": "frontend/**",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
+    { "src": "/api/(.*)", "dest": "api/index.py" },
+
+    {
+      "src": "/config.js",
+      "dest": "api/index.py",
+      "headers": { "Cache-Control": "no-store, max-age=0" }
+    },
+
     {
       "src": "/(css|js|assets)/(.*)",
-      "dest": "api/index.py",
-      "headers": { "Cache-Control": "public, max-age=3600" }
+      "dest": "frontend/$1/$2",
+      "headers": { "Cache-Control": "public, max-age=3600, must-revalidate" }
     },
+    { "src": "/favicon.svg", "dest": "frontend/assets/favicon.svg" },
+
+    { "src": "/", "dest": "frontend/index.html" },
     { "src": "/(.*)", "dest": "api/index.py" }
   ]
 }

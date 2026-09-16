@@ -265,7 +265,22 @@ as **dimensions** in reports you have to register them once:
 Registration is not retroactive — data only flows into a dimension from the moment you
 create it, so do this before you launch rather than after.
 
-### 6. Reading it
+### 6. Setting it on the live deployment
+
+```bash
+vercel env add GA_MEASUREMENT_ID production
+```
+
+Paste the id when prompted, then redeploy so the running function picks it up:
+
+```bash
+vercel deploy --prod
+```
+
+Or do it in the dashboard: Project → Settings → Environment Variables. Either
+way a redeploy is needed, because the variable is read by the function process.
+
+### 7. Reading it
 
 - **Reports → Realtime** — confirm it works at all. Should populate within seconds.
 - **Reports → Engagement → Events** — counts per event. If `predict_run` is high but
@@ -303,14 +318,29 @@ deliberately small enough to fit a serverless function.
 
 ### Vercel
 
-`vercel.json` and `api/index.py` are already in the repo, so:
+Live at **<https://gamecastai.vercel.app>**.
+
+`vercel.json` and `api/index.py` are in the repo, and the project is linked to
+this GitHub repository, so **pushing to `main` deploys automatically**. To
+deploy by hand:
 
 ```bash
-vercel
+vercel deploy --prod
 ```
 
-Set `GA_MEASUREMENT_ID` under Project → Settings → Environment Variables, and
-redeploy. That is the whole deployment.
+One thing to know if you fork this: `vercel` derives the project name from the
+directory, and a directory named `GameCastAI` is rejected because Vercel
+project names must be lowercase. Link it explicitly first:
+
+```bash
+vercel link --yes --project gamecastai
+```
+
+`vercel.json` splits the traffic rather than sending everything to the
+function: `/api/*` and `/config.js` hit Python, while the CSS, JS and assets
+are served straight from the CDN. `config.js` is the one dynamic route marked
+`no-store`, because it carries the measurement id and has to reflect an
+environment change without a rebuild.
 
 ### Why the runtime is NumPy-only
 
