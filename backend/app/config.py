@@ -18,7 +18,12 @@ import os
 import re
 from pathlib import Path
 
-ENV_FILE = Path(".env")
+# Resolved from this file rather than the working directory. A serverless
+# platform starts the process wherever it likes, and a relative "models/" that
+# works locally then silently resolves to nothing there.
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+ENV_FILE = PROJECT_ROOT / ".env"
 
 # GA4 stream ids are always G- followed by an alphanumeric block. Validating
 # the shape means a typo fails loudly here rather than silently never

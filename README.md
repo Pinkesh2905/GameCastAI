@@ -41,13 +41,16 @@ macOS or Linux:
 source .venv/bin/activate
 ```
 
-Then:
+Then install the runtime dependencies — four packages, because the models are
+exported to a form NumPy can evaluate on its own:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-The trained models and the match archive are committed, so you can run it immediately:
+The exported models and the match archive are committed, so you can run it
+immediately. (To retrain, you also need `requirements-dev.txt` — see
+[Rebuilding from source](#rebuilding-from-source).)
 
 ```bash
 uvicorn backend.app.main:app --reload
@@ -295,59 +298,71 @@ GA4 sets cookies regardless of what the payload contains.
 
 ## Deploying
 
-The app is a single FastAPI process serving both the API and the static frontend, so
-anywhere that runs Python works.
+One FastAPI process serves both the API and the frontend, and the runtime is
+deliberately small enough to fit a serverless function.
+
+### Vercel
+
+`vercel.json` and `api/index.py` are already in the repo, so:
+
+```bash
+vercel
+```
+
+Set `GA_MEASUREMENT_ID` under Project → Settings → Environment Variables, and
+redeploy. That is the whole deployment.
+
+### Why the runtime is NumPy-only
+
+The obvious build does not fit. Vercel caps a serverless function at **250 MB
+unzipped**, and the training stack is nowhere near that:
+
+| Package | Size |
+|---|---:|
+| SciPy | 138 MB |
+| pyarrow | 87 MB |
+| pandas | 74 MB |
+| NumPy | 57 MB |
+| scikit-learn | 45 MB |
+| FastAPI + pydantic | 14 MB |
+| **Total** | **~415 MB** |
+
+None of it is needed to *use* a fitted model. The chase model is a logistic
+regression — a standardisation, a one-hot and a dot product. The score model is
+150 small regression trees. So `backend/ml/export_models.py` writes them out as
+JSON and npz, and `backend/app/inference.py` evaluates them in NumPy alone.
+The export refuses to write anything that does not match scikit-learn to 1e-9,
+and in practice it matches to around 1e-16.
+
+The data went the same way: `backend/ml/build_serving_data.py` repacks the
+parquet tables into a JSON catalogue and columnar npz, which drops pandas and
+pyarrow too.
+
+What that buys:
+
+| | Before | After |
+|---|---:|---:|
+| Deployed dependencies | ~415 MB | **~75 MB** |
+| Model artefacts | 916 KB | 152 KB |
+| Match archive | 6.9 MB | 5.1 MB |
+| Cold start | 2,220 ms | **840 ms** |
+| Replay request | 1,170 ms cold / 26 ms warm | **4.5 ms** |
+
+`tests/test_runtime_weight.py` exercises every endpoint in a subprocess and
+fails if pandas, scikit-learn, SciPy, pyarrow or joblib ends up imported. That
+is the only thing standing between one convenient import and a bundle that no
+longer deploys, so do not delete it.
+
+### Anywhere else
+
+Render, Railway and Fly.io run the same command with no special configuration:
 
 ```bash
 uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT
 ```
 
-**Render / Railway / Fly.io** — point the service at this repo, set the build command
-to `pip install -r requirements.txt` and the start command to the line above. Nothing
-else is needed: the models (916 KB) and the match archive (under 10 MB) are committed.
-
-Two things to know:
-
-- Add your deployed origin to the GA data stream before expecting numbers.
-- Free tiers usually sleep after inactivity. The first request after a sleep pays the
-  ~2 s model and archive load; every request after that is served from memory.
-
----
-
-## Rebuilding from source
-
-The committed models are enough to run the app. You only need this to retrain, to add
-a league, or to pull in a new season.
-
-```bash
-python -m backend.ml.download_data     # ~480 MB of Cricsheet JSON
-python -m backend.ml.build_dataset     # parse into model-ready parquet
-python -m backend.ml.train             # fit, evaluate, write models/
-```
-
-Each accepts `--league ipl` (repeatable) to work on one competition. The full run takes
-a few minutes, most of it the download.
-
-### Adding a competition
-
-Cricsheet publishes archives for most T20 leagues. Add a row to
-[`backend/ml/leagues.py`](backend/ml/leagues.py):
-
-```python
-League(
-    code="cpl",
-    name="Caribbean Premier League",
-    short="CPL",
-    cricsheet="cpl_male_json",     # the slug from cricsheet.org/downloads
-    accent="#e879a6",
-    blurb="The Caribbean T20 league.",
-),
-```
-
-Then rerun the three commands above with `--league cpl`. The interface picks it up from
-`/api/leagues` with no frontend change.
-
----
+Build command `pip install -r requirements.txt`. Free tiers usually sleep after
+inactivity, so the first visitor after a quiet spell pays the cold start.
 
 ## Project layout
 
@@ -361,8 +376,12 @@ backend/
     priors.py            venue par scores, shrunk toward the league mean
     build_dataset.py     ball-by-ball to labelled snapshots
     train.py             fit, calibrate, evaluate, write the model card
-  app/                   the serving layer
+    export_models.py     scikit-learn -> JSON/npz, verified to 1e-9
+    build_serving_data.py  parquet -> JSON/npz, so the server needs no pandas
+  app/                   the serving layer (NumPy only, no scikit-learn)
     main.py              FastAPI routes
+    config.py            environment settings, incl. the GA measurement id
+    inference.py         model evaluation in NumPy
     engine.py            prediction, scenarios, narrative
     matches.py           match browsing and ball-by-ball replay
     schemas.py           request validation
@@ -373,9 +392,11 @@ frontend/
   js/api.js              fetch wrapper with request cancellation
   js/charts.js           hand-built SVG, including the worm
   js/app.js              application logic and URL state
-models/                  trained models and model cards, one set per league
-data/processed/          match archive (committed) and training tables (not)
-tests/                   53 tests
+api/index.py             Vercel entry point
+models/                  model cards, exported artefacts, and the joblib originals
+data/serve/              what the server reads: catalogue JSON and delivery npz
+data/processed/          parquet intermediates, used only to rebuild the above
+tests/                   63 tests
 ```
 
 `features.py` is the file to be careful with. Training and serving both import it, so a
@@ -390,11 +411,12 @@ two implementations that quietly drift apart.
 pytest
 ```
 
-53 tests. Beyond the usual shape checks they assert that the thing behaves like
+63 tests. Beyond the usual shape checks they assert that the thing behaves like
 cricket: a wicket never helps the chasing side, more runs never hurt, the probability
 curve rises monotonically with score, a stiffer target is harder, a wicket costs more
 than the runs that came with it, and a settled match returns exactly 0 or 1 rather than
-a confident guess.
+a confident guess. One test guards the deployment: it fails if a training-only
+package is imported while serving a request.
 
 ---
 

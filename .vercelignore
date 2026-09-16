@@ -1,0 +1,22 @@
+# Everything the training pipeline needs and the server does not. Keeping
+# these out is what holds the function under Vercel's 250 MB limit.
+
+.venv/
+venv/
+__pycache__/
+.pytest_cache/
+tests/
+.git/
+.claude/
+
+# Cricsheet source JSON (~480 MB) and the parquet intermediates. The server
+# reads data/serve/ instead, which is built from these offline.
+data/raw/
+data/processed/
+
+# The scikit-learn pickles. backend/ml/export_models.py turns these into the
+# JSON and npz that backend/app/inference.py actually reads.
+models/*.joblib
+
+*.log
+.env

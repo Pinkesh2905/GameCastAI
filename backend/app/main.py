@@ -19,7 +19,7 @@ from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 
 from backend.app import matches as match_service
-from backend.app.config import public_config
+from backend.app.config import PROJECT_ROOT, public_config
 from backend.app.engine import (
     LeagueNotAvailable,
     available_leagues,
@@ -39,7 +39,7 @@ from backend.app.schemas import ChaseRequest, SettingRequest
 from backend.ml.features import ChaseState, SettingState
 from backend.ml.leagues import BY_CODE
 
-FRONTEND_DIR = Path("frontend")
+FRONTEND_DIR = PROJECT_ROOT / "frontend"
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):

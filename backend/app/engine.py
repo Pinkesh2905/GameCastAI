@@ -18,12 +18,11 @@ from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 
-import joblib
-import pandas as pd
+import numpy as np
 
+from backend.app.config import PROJECT_ROOT
+from backend.app.inference import ChaseModel, SettingModel
 from backend.ml.features import (
-    CHASE_FEATURES,
-    SETTING_FEATURES,
     ChaseState,
     SettingState,
     chase_features,
@@ -33,8 +32,7 @@ from backend.ml.features import (
 from backend.ml.leagues import BY_CODE, DEFAULT_LEAGUE
 from backend.ml.priors import Priors
 
-MODEL_DIR = Path("models")
-DATA_DIR = Path("data/processed")
+MODEL_DIR = PROJECT_ROOT / "models"
 
 # Five overs, matching the rolling window the models were trained on.
 FORM_WINDOW = 30
@@ -50,45 +48,48 @@ class Bundle:
 
     code: str
     meta: dict
-    chase_model: object
-    setting_model: object | None
-    setting_offsets: dict
+    chase_model: ChaseModel
+    setting_model: SettingModel | None
     priors: Priors
 
 
 @lru_cache(maxsize=None)
 def load_bundle(code: str) -> Bundle:
-    chase_path = MODEL_DIR / f"{code}_chase.joblib"
+    """Load a league from the exported artefacts, not the training pickles.
+
+    `backend.ml.export_models` writes a JSON and an npz that reproduce the
+    fitted estimators exactly. Reading those instead of the joblib files is
+    what keeps scikit-learn, SciPy and their 180 MB out of the runtime.
+    """
+    chase_path = MODEL_DIR / f"{code}_chase.json"
     meta_path = MODEL_DIR / f"{code}_meta.json"
     if not chase_path.exists() or not meta_path.exists():
         raise LeagueNotAvailable(code)
 
     meta = json.loads(meta_path.read_text(encoding="utf-8"))
+    chase_model = ChaseModel(json.loads(chase_path.read_text(encoding="utf-8")))
 
     setting_model = None
-    setting_offsets: dict = {}
-    setting_path = MODEL_DIR / f"{code}_setting.joblib"
+    setting_path = MODEL_DIR / f"{code}_setting.npz"
     if setting_path.exists():
-        payload = joblib.load(setting_path)
-        setting_model = payload["model"]
-        setting_offsets = payload["offsets"]
+        with np.load(setting_path, allow_pickle=False) as payload:
+            setting_model = SettingModel({k: payload[k] for k in payload.files})
 
     return Bundle(
         code=code,
         meta=meta,
-        chase_model=joblib.load(chase_path),
+        chase_model=chase_model,
         setting_model=setting_model,
-        setting_offsets=setting_offsets,
         priors=Priors.from_dict(meta.get("priors", {})),
     )
 
 
 @lru_cache(maxsize=None)
 def available_leagues() -> tuple:
-    """League codes that have a trained model, in registry order."""
+    """League codes that have an exported model, in registry order."""
     codes = []
     for code in BY_CODE:
-        if (MODEL_DIR / f"{code}_chase.joblib").exists():
+        if (MODEL_DIR / f"{code}_chase.json").exists():
             codes.append(code)
     return tuple(codes)
 
@@ -125,8 +126,7 @@ def win_probability(bundle: Bundle, state: ChaseState) -> float:
         return 0.0
 
     state.venue_par = bundle.priors.par_for(state.venue)
-    row = pd.DataFrame([chase_features(state)])[CHASE_FEATURES]
-    probability = float(bundle.chase_model.predict_proba(row)[0][1])
+    probability = float(bundle.chase_model.predict([chase_features(state)])[0])
     # Never show a certainty the model has not earned.
     return min(max(probability, 0.001), 0.999)
 
@@ -137,14 +137,8 @@ def project_score(bundle: Bundle, state: SettingState) -> dict | None:
         return None
 
     state.venue_par = bundle.priors.par_for(state.venue)
-    row = pd.DataFrame([setting_features(state)])[SETTING_FEATURES]
-    midpoint = float(bundle.setting_model.predict(row)[0])
-
-    bucket = min(int(state.balls_bowled) // 30, 3)
-    offsets = bundle.setting_offsets.get("by_bucket", {})
-    band = offsets.get(str(bucket), offsets.get(bucket)) or bundle.setting_offsets.get(
-        "fallback", {"low": -25.0, "high": 25.0}
-    )
+    midpoint = float(bundle.setting_model.predict([setting_features(state)])[0])
+    band = bundle.setting_model.band(state.balls_bowled)
 
     # The projection can never fall below what is already on the board.
     floor = float(state.score)
